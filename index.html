@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Ban &amp; Pick - MLBB</title>
+<link rel="stylesheet" href="css/style.css?v=20261012"/>
+</head>
+<body>
+<header class="app-header">
+  <h1>Ban &amp; Pick</h1>
+  <p class="sub">Rekomendasi pick &amp; ban dari data rank resmi Mobile Legends</p>
+</header>
+<main class="wrap bp-wrap">
+  <section class="bp-inputs">
+    <div class="bp-field" data-list="ban">
+      <label for="in-ban">Hero di-ban</label>
+      <div class="chip-box"><div class="chips" id="chips-ban"></div><input id="in-ban" type="text" placeholder="Ketik nama hero..." autocomplete="off"/></div>
+      <ul class="ac-list hidden" id="ac-ban"></ul>
+    </div>
+    <div class="bp-field" data-list="ally">
+      <label for="in-ally">Hero tim kita</label>
+      <div class="chip-box"><div class="chips" id="chips-ally"></div><input id="in-ally" type="text" placeholder="Ketik nama hero..." autocomplete="off"/></div>
+      <ul class="ac-list hidden" id="ac-ally"></ul>
+    </div>
+    <div class="bp-field" data-list="enemy">
+      <label for="in-enemy">Hero musuh</label>
+      <div class="chip-box"><div class="chips" id="chips-enemy"></div><input id="in-enemy" type="text" placeholder="Ketik nama hero..." autocomplete="off"/></div>
+      <ul class="ac-list hidden" id="ac-enemy"></ul>
+    </div>
+    <div class="bp-actions">
+      <div class="bp-rank-switch" role="group" aria-label="Sumber data rank">
+        <button type="button" class="rank-chip on" data-pool="mythic" aria-pressed="true">Mythic</button>
+        <button type="button" class="rank-chip" data-pool="all" aria-pressed="false">All Rank</button>
+      </div>
+      <button type="button" id="bp-reset">Reset semua</button>
+      <span class="bp-msg" id="bp-msg"></span>
+    </div>
+  </section>
+
+  <section class="bp-results">
+    <div class="bp-col">
+      <div class="bp-col-head"><h2 class="section-title">Rekomendasi pick</h2></div>
+      <div class="bp-roles" id="role-filter" role="group" aria-label="Filter role rekomendasi pick">
+        <button type="button" class="role-chip on" data-role="Tank" aria-pressed="true">Tank</button>
+        <button type="button" class="role-chip on" data-role="Fighter" aria-pressed="true">Fighter</button>
+        <button type="button" class="role-chip on" data-role="Assassin" aria-pressed="true">Assassin</button>
+        <button type="button" class="role-chip on" data-role="Mage" aria-pressed="true">Mage</button>
+        <button type="button" class="role-chip on" data-role="Marksman" aria-pressed="true">Marksman</button>
+        <button type="button" class="role-chip on" data-role="Support" aria-pressed="true">Support</button>
+      </div>
+      <div class="bp-roles" id="lane-filter" role="group" aria-label="Filter lane rekomendasi pick">
+        <button type="button" class="role-chip on" data-lane="Exp Lane" aria-pressed="true">Exp</button>
+        <button type="button" class="role-chip on" data-lane="Jungling" aria-pressed="true">Jungle</button>
+        <button type="button" class="role-chip on" data-lane="Mid Lane" aria-pressed="true">Mid</button>
+        <button type="button" class="role-chip on" data-lane="Gold Lane" aria-pressed="true">Gold</button>
+        <button type="button" class="role-chip on" data-lane="Roaming" aria-pressed="true">Roam</button>
+      </div>
+      <div id="out-pick" class="bp-list"></div>
+    </div>
+    <div class="bp-col">
+      <h2 class="section-title">Rekomendasi ban</h2>
+      <div id="out-ban" class="bp-list"></div>
+    </div>
+  </section>
+
+  <section class="bp-formula">
+    <h2 class="section-title">Cara hitung skor</h2>
+    <div class="formula-grid">
+      <div class="formula-card">
+        <h3>Skor pick (kandidat K)</h3>
+        <p class="formula">Skor = &Sigma; Counter(K &rarr; musuh) &minus; &Sigma; Counter(musuh &rarr; K) + &Sigma; Sinergi(K, tim kita) &minus; &Sigma; Anti(K, tim kita)</p>
+      </div>
+      <div class="formula-card">
+        <h3>Skor ban (kandidat K)</h3>
+        <p class="formula">Skor = &Sigma; Counter(K &rarr; tim kita) + &Sigma; Sinergi(K, musuh) &minus; &Sigma; Anti(K, musuh)</p>
+      </div>
+    </div>
+    <ul class="formula-notes">
+      <li><strong>Counter(A &rarr; B)</strong> = skor di daftar <em>strong against</em> milik A untuk B, atau nilai absolut skor di daftar <em>weak against</em> milik B untuk A. Kalau tercatat di dua daftar, dipakai nilai terbesar (dihitung sekali).</li>
+      <li><strong>Sinergi(A, B)</strong> = skor di daftar <em>best teammates</em>. Dicek dari kedua hero, dipakai nilai terbesar, sekali.</li>
+      <li><strong>Anti(A, B)</strong> = nilai absolut skor di daftar <em>weakest teammates</em>. Dicek dari kedua hero, dipakai nilai terbesar, sekali. Ini yang bikin rumusnya beda dari HoK: data ML punya anti-sinergi, dan tidak punya trio.</li>
+      <li>Tiap hero cuma menyimpan 5 pasangan per daftar. Pasangan yang tidak masuk daftar itu skornya 0 di hitungan ini.</li>
+      <li>Angka dipakai apa adanya. Win rate, pick rate, dan ban rate cuma ditampilkan di kartu, tidak masuk skor. Hero yang sudah di-ban atau di-pick tidak direkomendasikan.</li>
+      <li>Filter role dan lane cuma berlaku untuk rekomendasi pick. Hero lolos kalau punya salah satu role yang nyala dan salah satu lane yang nyala. Rekomendasi ban tidak difilter.</li>
+      <li>Toggle Mythic / All Rank mengganti seluruh angka ke pool data itu.</li>
+    </ul>
+  </section>
+</main>
+<footer class="app-footer">Sumber: <a href="https://www.mobilelegends.com/rank">mobilelegends.com/rank</a> | data 2026-10-10</footer>
+<script src="data/banpick.js?v=20261012"></script>
+<script src="js/banpick.js?v=20261012"></script>
+</body>
+</html>
