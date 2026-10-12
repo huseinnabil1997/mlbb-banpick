@@ -83,13 +83,13 @@
       <li><strong>Anti(A, B)</strong> = nilai absolut skor di daftar <em>weakest teammates</em>. Dicek dari kedua hero, dipakai nilai terbesar, sekali. Ini yang bikin rumusnya beda dari HoK: data ML punya anti-sinergi, dan tidak punya trio.</li>
       <li>Tiap hero cuma menyimpan 5 pasangan per daftar. Pasangan yang tidak masuk daftar itu skornya 0 di hitungan ini.</li>
       <li>Angka dipakai apa adanya. Win rate, pick rate, dan ban rate cuma ditampilkan di kartu, tidak masuk skor. Hero yang sudah di-ban atau di-pick tidak direkomendasikan.</li>
-      <li>Filter role dan lane cuma berlaku untuk rekomendasi pick. Hero lolos kalau punya salah satu role yang nyala dan salah satu lane yang nyala. Rekomendasi ban tidak difilter.</li>
+      <li>Filter role dan lane cuma berlaku untuk rekomendasi pick. Hero lolos kalau ada pasangan role+lane yang cocok (urutan sama dengan data hero, mis. Assassin–Jungle / Mage–Mid). Hero satu lane atau satu role tetap cocok kalau lane/role itu nyala. Rekomendasi ban tidak difilter. Tombol reset juga mengembalikan filter ke semua nyala.</li>
       <li>Toggle Mythic / All Rank mengganti seluruh angka ke pool data itu.</li>
     </ul>
   </section>
 </main>
 <footer class="app-footer">Sumber: <a href="https://www.mobilelegends.com/rank">mobilelegends.com/rank</a> | data 2026-10-10</footer>
 <script src="data/banpick.js?v=20261012"></script>
-<script src="js/banpick.js?v=20261012"></script>
+<script src="js/banpick.js?v=20261012f"></script>
 </body>
 </html>

@@ -59,6 +59,24 @@
 
   function taken() { return state.ban.concat(state.ally, state.enemy); }
 
+  function heroMatchesRoleLaneFilter(h) {
+    var roles = h.roles;
+    var lanes = h.lanes;
+    if (roles.length === lanes.length) {
+      for (var i = 0; i < roles.length; i++) {
+        if (roleOn[roles[i]] && laneOn[lanes[i]]) return true;
+      }
+      return false;
+    }
+    if (lanes.length === 1) {
+      return laneOn[lanes[0]] && roles.some(function (role) { return roleOn[role]; });
+    }
+    if (roles.length === 1) {
+      return roleOn[roles[0]] && lanes.some(function (lane) { return laneOn[lane]; });
+    }
+    return roles.some(function (role) { return roleOn[role]; }) && lanes.some(function (lane) { return laneOn[lane]; });
+  }
+
   function card(k, sc, rank) {
     var h = H[k];
     var r = rankOf(k);
@@ -79,13 +97,8 @@
       return;
     }
     function list(fn, el, emptyMsg, filterPick) {
-      var rows = cands.map(function (k) { return { k: k, s: fn(k) }; }).filter(function (row) { return row.s.total > 0; });
-      if (filterPick) {
-        rows = rows.filter(function (row) {
-          var h = H[row.k];
-          return h.roles.some(function (role) { return roleOn[role]; }) && h.lanes.some(function (lane) { return laneOn[lane]; });
-        });
-      }
+      var poolIds = filterPick ? cands.filter(function (k) { return heroMatchesRoleLaneFilter(H[k]); }) : cands;
+      var rows = poolIds.map(function (k) { return { k: k, s: fn(k) }; }).filter(function (row) { return row.s.total > 0; });
       rows.sort(function (a, b) { return b.s.total - a.s.total || nm(a.k).localeCompare(nm(b.k)); });
       el.innerHTML = rows.length ? rows.slice(0, TOP).map(function (row, i) { return card(row.k, row.s, i + 1); }).join("") : '<p class="bp-empty">' + emptyMsg + "</p>";
     }
@@ -174,9 +187,18 @@
     var b = ev.target.closest(".chip button");
     if (b) remove(b.dataset.k, b.dataset.s);
   });
+  function resetFilters() {
+    ROLES.forEach(function (r) { roleOn[r] = true; });
+    LANES.forEach(function (l) { laneOn[l] = true; });
+    document.querySelectorAll("#role-filter .role-chip, #lane-filter .role-chip").forEach(function (btn) {
+      btn.classList.add("on");
+      btn.setAttribute("aria-pressed", "true");
+    });
+  }
   document.getElementById("bp-reset").addEventListener("click", function () {
     state = { ban: [], ally: [], enemy: [] };
     ["ban", "ally", "enemy"].forEach(renderChips);
+    resetFilters();
     setMsg("");
     render();
   });
