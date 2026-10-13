@@ -23,7 +23,6 @@
     if (left === right) return 0;
     if (!left.length) return right.length;
     if (!right.length) return left.length;
-    if (right.indexOf(left) === 0 || left.indexOf(right) === 0) return Math.abs(left.length - right.length);
     var prev = [];
     var i, j;
     for (j = 0; j <= right.length; j++) prev[j] = j;
@@ -40,7 +39,8 @@
 
   function score(query, name) {
     if (query === name) return 0;
-    if (name.indexOf(query) === 0 || query.indexOf(name) === 0) return Math.abs(name.length - query.length) * 0.4;
+    if (query.length <= name.length && name.indexOf(query) === 0) return (name.length - query.length) * 0.4;
+    if (Math.abs(query.length - name.length) > 2) return 99;
     return editDistance(query, name);
   }
 
@@ -66,15 +66,34 @@
     return best;
   }
 
+  function matchMany(text) {
+    var words = String(text).toLowerCase().replace(/\bnumber\b/g, "no").replace(/['’.]/g, " ").split(/[^a-z0-9]+/).filter(Boolean);
+    var found = [];
+    var i = 0;
+    while (i < words.length) {
+      var hit = null;
+      var take = 1;
+      var max = Math.min(4, words.length - i);
+      for (var n = max; n >= 1; n--) {
+        var name = matchName(words.slice(i, i + n).join(" "));
+        if (name) { hit = name; take = n; break; }
+      }
+      if (hit) found.push(hit);
+      i += take;
+    }
+    return found;
+  }
+
   var rec = new Ctor();
   rec.lang = "en-US";
   rec.interimResults = true;
-  rec.continuous = false;
+  rec.continuous = true;
 
   var token = 0;
   var live = 0;
   var activeInput = null;
   var activeBtn = null;
+  var added = {};
 
   function clearButton() {
     if (!activeBtn) return;
@@ -87,28 +106,47 @@
 
   rec.onstart = function () { live = token; };
   rec.onend = function () {
+    if (live !== token || !activeInput) return;
+    setTimeout(function () {
+      if (live !== token || !activeInput) return;
+      try { rec.start(); } catch (err) { clearButton(); }
+    }, 150);
+  };
+  rec.onerror = function (event) {
     if (live !== token) return;
+    if (event.error === "aborted" || event.error === "no-speech") return;
     clearButton();
   };
-  rec.onerror = function () {
-    if (live !== token) return;
-    clearButton();
-  };
+  function commit(name) {
+    var key = fold(name);
+    if (added[key]) return;
+    added[key] = true;
+    activeInput.value = name;
+    activeInput.dispatchEvent(new Event("input", { bubbles: true }));
+    activeInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+  }
   rec.onresult = function (event) {
     if (!activeInput) return;
-    var text = "";
-    var isFinal = false;
-    for (var i = event.resultIndex; i < event.results.length; i++) {
-      text += event.results[i][0].transcript;
-      if (event.results[i].isFinal) isFinal = true;
+    var finalText = "";
+    var interim = "";
+    for (var i = 0; i < event.results.length; i++) {
+      var chunk = event.results[i][0].transcript;
+      if (event.results[i].isFinal) finalText += " " + chunk;
+      else interim += chunk;
     }
-    text = text.trim();
-    var picked = isFinal ? matchName(text) : null;
-    activeInput.value = picked || text;
+    finalText = finalText.trim();
+    interim = interim.trim();
+    var picking = activeInput.getAttribute("data-speech") === "pick";
+    if (picking) {
+      matchMany(finalText).forEach(commit);
+      activeInput.value = interim;
+      if (interim) activeInput.dispatchEvent(new Event("input", { bubbles: true }));
+      return;
+    }
+    var shown = (finalText + " " + interim).trim();
+    var many = matchMany(shown);
+    activeInput.value = many.length === 1 ? many[0] : shown;
     activeInput.dispatchEvent(new Event("input", { bubbles: true }));
-    if (picked && activeInput.getAttribute("data-speech") === "pick") {
-      activeInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-    }
   };
 
   function listen(btn, input) {
@@ -116,6 +154,7 @@
     clearButton();
     activeBtn = btn;
     activeInput = input;
+    added = {};
     btn.classList.add("on");
     btn.textContent = "Stop";
     btn.setAttribute("aria-pressed", "true");
