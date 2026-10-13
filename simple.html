@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Ban &amp; Pick Simpel - MLBB</title>
-<link rel="stylesheet" href="css/style.css?v=20261012e"/>
+<link rel="stylesheet" href="css/style.css?v=20261013a"/>
 </head>
 <body>
 <header class="app-header">
@@ -16,17 +16,17 @@
   <section class="bp-inputs">
     <div class="bp-field" data-list="ban">
       <label for="in-ban">Hero di-ban</label>
-      <div class="chip-box"><div class="chips" id="chips-ban"></div><input id="in-ban" type="text" placeholder="Ketik nama hero..." autocomplete="off"/></div>
+      <div class="chip-box"><div class="chips" id="chips-ban"></div><input id="in-ban" data-speech="pick" type="text" placeholder="Ketik nama hero..." autocomplete="off"/></div>
       <ul class="ac-list hidden" id="ac-ban"></ul>
     </div>
     <div class="bp-field" data-list="ally">
       <label for="in-ally">Hero tim kita</label>
-      <div class="chip-box"><div class="chips" id="chips-ally"></div><input id="in-ally" type="text" placeholder="Ketik nama hero..." autocomplete="off"/></div>
+      <div class="chip-box"><div class="chips" id="chips-ally"></div><input id="in-ally" data-speech="pick" type="text" placeholder="Ketik nama hero..." autocomplete="off"/></div>
       <ul class="ac-list hidden" id="ac-ally"></ul>
     </div>
     <div class="bp-field" data-list="enemy">
       <label for="in-enemy">Hero musuh</label>
-      <div class="chip-box"><div class="chips" id="chips-enemy"></div><input id="in-enemy" type="text" placeholder="Ketik nama hero..." autocomplete="off"/></div>
+      <div class="chip-box"><div class="chips" id="chips-enemy"></div><input id="in-enemy" data-speech="pick" type="text" placeholder="Ketik nama hero..." autocomplete="off"/></div>
       <ul class="ac-list hidden" id="ac-enemy"></ul>
     </div>
     <div class="bp-actions">
@@ -91,5 +91,6 @@
 <footer class="app-footer">Sumber: <a href="https://www.mobilelegends.com/rank">mobilelegends.com/rank</a> | data 2026-10-10</footer>
 <script src="data/banpick.js?v=20261012"></script>
 <script src="js/banpick-simple.js?v=20261012e"></script>
+<script src="js/speech.js?v=20261013a"></script>
 </body>
 </html>
