@@ -1,8 +1,12 @@
 (function () {
   "use strict";
+  // Engine di repo ini Web Speech API (SpeechRecognition / webkitSpeechRecognition), bukan Whisper.
+  // API ini tidak punya initial_prompt, jadi daftar hero dipakai setelah transkrip final
+  // lewat fuzzy match Levenshtein + kamus alias.
   var Ctor = window.SpeechRecognition || window.webkitSpeechRecognition;
   var inputs = document.querySelectorAll("input[data-speech]");
   if (!Ctor || !inputs.length) return;
+  var Match = window.HeroMatch;
 
   function heroNames() {
     var data = window.BANPICK_DATA;
@@ -16,72 +20,7 @@
   }
 
   function fold(value) {
-    return String(value).toLowerCase().replace(/\bnumber\b/g, "no").replace(/['’.]/g, "").replace(/[^a-z0-9]+/g, "");
-  }
-
-  function editDistance(left, right) {
-    if (left === right) return 0;
-    if (!left.length) return right.length;
-    if (!right.length) return left.length;
-    var prev = [];
-    var i, j;
-    for (j = 0; j <= right.length; j++) prev[j] = j;
-    for (i = 1; i <= left.length; i++) {
-      var cur = [i];
-      for (j = 1; j <= right.length; j++) {
-        var cost = left.charAt(i - 1) === right.charAt(j - 1) ? 0 : 1;
-        cur[j] = Math.min(cur[j - 1] + 1, prev[j] + 1, prev[j - 1] + cost);
-      }
-      prev = cur;
-    }
-    return prev[right.length];
-  }
-
-  function score(query, name) {
-    if (query === name) return 0;
-    if (query.length <= name.length && name.indexOf(query) === 0) return (name.length - query.length) * 0.4;
-    if (Math.abs(query.length - name.length) > 2) return 99;
-    return editDistance(query, name);
-  }
-
-  function matchName(text) {
-    var query = fold(text);
-    var list = heroNames();
-    if (!query || !list.length) return null;
-    var best = null;
-    var bestDistance = 99;
-    var ties = 0;
-    for (var i = 0; i < list.length; i++) {
-      var gap = score(query, fold(list[i]));
-      if (gap < bestDistance) {
-        bestDistance = gap;
-        best = list[i];
-        ties = 1;
-      } else if (gap === bestDistance) {
-        ties += 1;
-      }
-    }
-    var limit = Math.max(1, Math.ceil(query.length * 0.45));
-    if (!best || bestDistance > limit || ties > 1) return null;
-    return best;
-  }
-
-  function matchMany(text) {
-    var words = String(text).toLowerCase().replace(/\bnumber\b/g, "no").replace(/['’.]/g, " ").split(/[^a-z0-9]+/).filter(Boolean);
-    var found = [];
-    var i = 0;
-    while (i < words.length) {
-      var hit = null;
-      var take = 1;
-      var max = Math.min(4, words.length - i);
-      for (var n = max; n >= 1; n--) {
-        var name = matchName(words.slice(i, i + n).join(" "));
-        if (name) { hit = name; take = n; break; }
-      }
-      if (hit) found.push(hit);
-      i += take;
-    }
-    return found;
+    return Match ? Match.fold(value) : String(value).toLowerCase();
   }
 
   // iOS Safari meminta izin mic ulang di setiap rec.start(), jadi jangan auto-restart di iOS.
@@ -123,20 +62,43 @@
     if (event.error === "no-speech" && !isIOS) return;
     clearButton();
   };
+
   function commit(name) {
     var key = fold(name);
     if (added[key]) return;
     added[key] = true;
+    if (window.HeroPicker && window.HeroPicker.addByName) {
+      window.HeroPicker.addByName(name);
+      return;
+    }
     activeInput.value = name;
     activeInput.dispatchEvent(new Event("input", { bubbles: true }));
     activeInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
   }
-  // Pilih alternatif transkrip yang paling banyak cocok dengan nama hero.
+
+  function showUncertain(heard, part) {
+    var detail = {
+      query: part && part.query ? part.query : heard,
+      heard: heard,
+      candidates: part && part.candidates ? part.candidates : []
+    };
+    if (window.HeroPicker && window.HeroPicker.showCandidates) {
+      window.HeroPicker.showCandidates(detail);
+      return;
+    }
+    activeInput.value = "";
+    activeInput.dispatchEvent(new CustomEvent("speech-candidates", { bubbles: true, detail: detail }));
+  }
+
   function bestFinal(result) {
-    var best = { text: result[0].transcript, names: matchMany(result[0].transcript) };
+    var names = heroNames();
+    var aliasMap = window.HERO_ALIASES || {};
+    var best = { text: result[0].transcript, parts: Match ? Match.matchMany(result[0].transcript, names, aliasMap) : [] };
     for (var k = 1; k < result.length; k++) {
-      var names = matchMany(result[k].transcript);
-      if (names.length > best.names.length) best = { text: result[k].transcript, names: names };
+      var parts = Match ? Match.matchMany(result[k].transcript, names, aliasMap) : [];
+      var hits = parts.filter(function (part) { return part.kind === "match"; }).length;
+      var bestHits = best.parts.filter(function (part) { return part.kind === "match"; }).length;
+      if (hits > bestHits) best = { text: result[k].transcript, parts: parts };
     }
     return best;
   }
@@ -144,13 +106,13 @@
   rec.onresult = function (event) {
     if (!activeInput) return;
     var finalText = "";
-    var finalNames = [];
+    var parts = [];
     var interim = "";
     for (var i = 0; i < event.results.length; i++) {
       if (event.results[i].isFinal) {
         var pick = bestFinal(event.results[i]);
         finalText += " " + pick.text;
-        finalNames = finalNames.concat(pick.names);
+        parts = parts.concat(pick.parts);
       } else {
         interim += event.results[i][0].transcript;
       }
@@ -158,18 +120,27 @@
     finalText = finalText.trim();
     interim = interim.trim();
     var picking = activeInput.getAttribute("data-speech") === "pick";
-    if (picking) {
-      finalNames.forEach(commit);
-      activeInput.value = interim;
-      if (interim) activeInput.dispatchEvent(new Event("input", { bubbles: true }));
+    if (picking && finalText) {
+      var uncertain = null;
+      parts.forEach(function (part) {
+        if (part.kind === "match") commit(part.name);
+        else if (part.kind === "uncertain" && !uncertain) uncertain = part;
+      });
+      if (uncertain || !parts.length) showUncertain(finalText, uncertain);
+      else if (interim) {
+        activeInput.value = interim;
+        activeInput.dispatchEvent(new Event("input", { bubbles: true }));
+      }
       return;
     }
-    // Interim hanya untuk tampilan; pencocokan nama pakai hasil final saja.
-    if (interim) {
-      activeInput.value = (finalText + " " + interim).trim();
-    } else {
-      activeInput.value = finalNames.length === 1 ? finalNames[0] : finalText;
+    if (!finalText && interim) {
+      activeInput.value = interim;
+      activeInput.dispatchEvent(new Event("input", { bubbles: true }));
+      return;
     }
+    if (interim) activeInput.value = (finalText + " " + interim).trim();
+    else if (parts.length === 1 && parts[0].kind === "match") activeInput.value = parts[0].name;
+    else activeInput.value = finalText;
     activeInput.dispatchEvent(new Event("input", { bubbles: true }));
   };
 

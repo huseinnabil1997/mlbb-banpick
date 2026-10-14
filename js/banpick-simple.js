@@ -7,6 +7,10 @@
   var NAME = {};
   IDS.forEach(function (id) { NAME[id] = H[id].name; });
   var state = { ban: [], ally: [], enemy: [] };
+  var listeners = [];
+  function notify() {
+    for (var i = 0; i < listeners.length; i++) listeners[i]();
+  }
   var LABEL = { ban: "di-ban", ally: "tim kita", enemy: "musuh" };
   var ROLES = ["Tank", "Fighter", "Assassin", "Mage", "Marksman", "Support"];
   var LANES = ["Exp Lane", "Jungling", "Mid Lane", "Gold Lane", "Roaming"];
@@ -121,67 +125,15 @@
     setMsg("");
     renderChips(key);
     render();
+    notify();
     return true;
   }
   function remove(key, id) {
     state[key] = state[key].filter(function (s) { return s !== id; });
     renderChips(key);
     render();
+    notify();
   }
-
-  ["ban", "ally", "enemy"].forEach(function (key) {
-    var input = document.getElementById("in-" + key);
-    var ac = document.getElementById("ac-" + key);
-    var active = -1;
-    var opts = [];
-    var skipFocus = false;
-    function close() { ac.classList.add("hidden"); active = -1; }
-    function show() {
-      var q = input.value.trim().toLowerCase();
-      var t = taken();
-      opts = IDS.filter(function (id) {
-        if (t.indexOf(id) >= 0) return false;
-        if (!q) return true;
-        return H[id].name.toLowerCase().indexOf(q) >= 0 || id === q;
-      }).sort(function (a, b) {
-        function rankName(id) {
-          if (!q) return 0;
-          var n = H[id].name.toLowerCase();
-          return n === q ? 0 : n.indexOf(q) === 0 ? 1 : 2;
-        }
-        return rankName(a) - rankName(b) || H[a].name.localeCompare(H[b].name);
-      }).slice(0, 12);
-      if (!opts.length) {
-        ac.innerHTML = '<li class="ac-none">Tidak ada hero yang cocok</li>';
-        ac.classList.remove("hidden");
-        return;
-      }
-      ac.innerHTML = opts.map(function (id, i) {
-        return '<li data-i="' + i + '"' + (i === active ? ' class="on"' : "") + ">" + esc(H[id].name) + "</li>";
-      }).join("");
-      ac.classList.remove("hidden");
-    }
-    function choose(i) {
-      if (opts[i] && add(key, opts[i])) input.value = "";
-      skipFocus = true;
-      close();
-      input.focus();
-    }
-    input.addEventListener("input", function () { active = -1; show(); });
-    input.addEventListener("focus", function () { if (skipFocus) { skipFocus = false; return; } show(); });
-    input.addEventListener("blur", function () { setTimeout(close, 150); });
-    input.addEventListener("keydown", function (ev) {
-      if (ev.key === "ArrowDown") { active = Math.min(active + 1, opts.length - 1); show(); ev.preventDefault(); }
-      else if (ev.key === "ArrowUp") { active = Math.max(active - 1, 0); show(); ev.preventDefault(); }
-      else if (ev.key === "Enter") { choose(active >= 0 ? active : 0); ev.preventDefault(); }
-      else if (ev.key === "Escape") close();
-      else if (ev.key === "Backspace" && !input.value && state[key].length) remove(key, state[key][state[key].length - 1]);
-    });
-    ac.addEventListener("mousedown", function (ev) {
-      var li = ev.target.closest("li[data-i]");
-      if (li) { ev.preventDefault(); choose(+li.dataset.i); }
-    });
-  });
 
   document.addEventListener("click", function (ev) {
     var b = ev.target.closest(".chip button");
@@ -201,12 +153,13 @@
     resetFilters();
     setMsg("");
     render();
+    notify();
   });
   document.querySelector(".bp-rank-switch").addEventListener("click", function (ev) {
     var btn = ev.target.closest(".rank-chip");
     if (!btn) return;
     pool = btn.getAttribute("data-pool");
-    document.querySelectorAll(".rank-chip").forEach(function (el) {
+    document.querySelectorAll(".bp-rank-switch .rank-chip").forEach(function (el) {
       var on = el === btn;
       el.classList.toggle("on", on);
       el.setAttribute("aria-pressed", on ? "true" : "false");
@@ -226,5 +179,13 @@
   }
   wireFilter(document.getElementById("role-filter"), roleOn, "data-role");
   wireFilter(document.getElementById("lane-filter"), laneOn, "data-lane");
+  window.Banpick = {
+    add: add,
+    remove: remove,
+    taken: taken,
+    heroes: H,
+    ids: IDS,
+    subscribe: function (fn) { listeners.push(fn); }
+  };
   render();
 })();

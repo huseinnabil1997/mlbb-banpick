@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Ban &amp; Pick - MLBB</title>
-<link rel="stylesheet" href="css/style.css?v=20261013a"/>
+<link rel="stylesheet" href="css/style.css?v=20261014b"/>
 </head>
 <body>
 <header class="app-header">
@@ -14,20 +14,45 @@
 </header>
 <main class="wrap bp-wrap">
   <section class="bp-inputs">
-    <div class="bp-field" data-list="ban">
-      <label for="in-ban">Hero di-ban</label>
-      <div class="chip-box"><div class="chips" id="chips-ban"></div><input id="in-ban" data-speech="pick" type="text" placeholder="Ketik nama hero..." autocomplete="off"/></div>
-      <ul class="ac-list hidden" id="ac-ban"></ul>
+    <div class="hero-picker" id="hero-picker">
+      <div class="picker-top">
+        <div class="picker-search">
+          <label for="hero-search">Cari hero</label>
+          <div class="picker-search-box">
+            <div class="chip-box"><input id="hero-search" data-speech="pick" type="text" placeholder="Ketik minimal 2 huruf..." autocomplete="off"/></div>
+            <ul class="ac-list hidden" id="ac-search"></ul>
+          </div>
+        </div>
+        <div class="picker-target" role="group" aria-label="Tambahkan hero ke">
+          <span class="picker-target-label">Tambahkan ke</span>
+          <button type="button" class="target-chip" data-target="ban" aria-pressed="false">Ban</button>
+          <button type="button" class="target-chip on" data-target="ally" aria-pressed="true">Tim kita</button>
+          <button type="button" class="target-chip" data-target="enemy" aria-pressed="false">Musuh</button>
+        </div>
+      </div>
+      <p class="picker-label">Saring role</p>
+      <div class="bp-roles" id="picker-role" role="group" aria-label="Filter role saat memilih hero">
+        <button type="button" class="role-chip on" data-role="Tank" aria-pressed="true">Tank</button>
+        <button type="button" class="role-chip on" data-role="Fighter" aria-pressed="true">Fighter</button>
+        <button type="button" class="role-chip on" data-role="Assassin" aria-pressed="true">Assassin</button>
+        <button type="button" class="role-chip on" data-role="Mage" aria-pressed="true">Mage</button>
+        <button type="button" class="role-chip on" data-role="Marksman" aria-pressed="true">Marksman</button>
+        <button type="button" class="role-chip on" data-role="Support" aria-pressed="true">Support</button>
+      </div>
+      <p class="picker-hint" id="picker-hint" aria-live="polite">Ketik minimal 2 huruf, saring role, atau klik ikon. Tombol Suara opsional.</p>
+      <div class="hero-grid" id="hero-grid" aria-label="Daftar hero"></div>
     </div>
-    <div class="bp-field" data-list="ally">
-      <label for="in-ally">Hero tim kita</label>
-      <div class="chip-box"><div class="chips" id="chips-ally"></div><input id="in-ally" data-speech="pick" type="text" placeholder="Ketik nama hero..." autocomplete="off"/></div>
-      <ul class="ac-list hidden" id="ac-ally"></ul>
+    <div class="bp-field" data-list="ban">
+      <label>Hero di-ban</label>
+      <div class="chip-box"><div class="chips" id="chips-ban"></div></div>
+    </div>
+    <div class="bp-field is-target" data-list="ally">
+      <label>Hero tim kita</label>
+      <div class="chip-box"><div class="chips" id="chips-ally"></div></div>
     </div>
     <div class="bp-field" data-list="enemy">
-      <label for="in-enemy">Hero musuh</label>
-      <div class="chip-box"><div class="chips" id="chips-enemy"></div><input id="in-enemy" data-speech="pick" type="text" placeholder="Ketik nama hero..." autocomplete="off"/></div>
-      <ul class="ac-list hidden" id="ac-enemy"></ul>
+      <label>Hero musuh</label>
+      <div class="chip-box"><div class="chips" id="chips-enemy"></div></div>
     </div>
     <div class="bp-actions">
       <div class="bp-rank-switch" role="group" aria-label="Sumber data rank">
@@ -90,7 +115,11 @@
 </main>
 <footer class="app-footer">Sumber: <a href="https://www.mobilelegends.com/rank">mobilelegends.com/rank</a> | data 2026-10-10</footer>
 <script src="data/banpick.js?v=20261012"></script>
-<script src="js/banpick.js?v=20261012f"></script>
-<script src="js/speech.js?v=20261014a"></script>
+<script src="data/hero-icons.js?v=20261014b"></script>
+<script src="js/hero-aliases.js?v=20261014b"></script>
+<script src="js/hero-match.js?v=20261014b"></script>
+<script src="js/banpick.js?v=20261014b"></script>
+<script src="js/hero-picker.js?v=20261014b"></script>
+<script src="js/speech.js?v=20261014b"></script>
 </body>
 </html>
