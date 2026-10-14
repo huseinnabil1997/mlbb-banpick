@@ -84,10 +84,14 @@
     return found;
   }
 
+  // iOS Safari meminta izin mic ulang di setiap rec.start(), jadi jangan auto-restart di iOS.
+  var isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   var rec = new Ctor();
   rec.lang = "en-US";
   rec.interimResults = true;
-  rec.continuous = true;
+  rec.continuous = !isIOS;
+  rec.maxAlternatives = 5;
 
   var token = 0;
   var live = 0;
@@ -107,6 +111,7 @@
   rec.onstart = function () { live = token; };
   rec.onend = function () {
     if (live !== token || !activeInput) return;
+    if (isIOS) { clearButton(); return; }
     setTimeout(function () {
       if (live !== token || !activeInput) return;
       try { rec.start(); } catch (err) { clearButton(); }
@@ -114,7 +119,8 @@
   };
   rec.onerror = function (event) {
     if (live !== token) return;
-    if (event.error === "aborted" || event.error === "no-speech") return;
+    if (event.error === "aborted") return;
+    if (event.error === "no-speech" && !isIOS) return;
     clearButton();
   };
   function commit(name) {
@@ -125,27 +131,45 @@
     activeInput.dispatchEvent(new Event("input", { bubbles: true }));
     activeInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
   }
+  // Pilih alternatif transkrip yang paling banyak cocok dengan nama hero.
+  function bestFinal(result) {
+    var best = { text: result[0].transcript, names: matchMany(result[0].transcript) };
+    for (var k = 1; k < result.length; k++) {
+      var names = matchMany(result[k].transcript);
+      if (names.length > best.names.length) best = { text: result[k].transcript, names: names };
+    }
+    return best;
+  }
+
   rec.onresult = function (event) {
     if (!activeInput) return;
     var finalText = "";
+    var finalNames = [];
     var interim = "";
     for (var i = 0; i < event.results.length; i++) {
-      var chunk = event.results[i][0].transcript;
-      if (event.results[i].isFinal) finalText += " " + chunk;
-      else interim += chunk;
+      if (event.results[i].isFinal) {
+        var pick = bestFinal(event.results[i]);
+        finalText += " " + pick.text;
+        finalNames = finalNames.concat(pick.names);
+      } else {
+        interim += event.results[i][0].transcript;
+      }
     }
     finalText = finalText.trim();
     interim = interim.trim();
     var picking = activeInput.getAttribute("data-speech") === "pick";
     if (picking) {
-      matchMany(finalText).forEach(commit);
+      finalNames.forEach(commit);
       activeInput.value = interim;
       if (interim) activeInput.dispatchEvent(new Event("input", { bubbles: true }));
       return;
     }
-    var shown = (finalText + " " + interim).trim();
-    var many = matchMany(shown);
-    activeInput.value = many.length === 1 ? many[0] : shown;
+    // Interim hanya untuk tampilan; pencocokan nama pakai hasil final saja.
+    if (interim) {
+      activeInput.value = (finalText + " " + interim).trim();
+    } else {
+      activeInput.value = finalNames.length === 1 ? finalNames[0] : finalText;
+    }
     activeInput.dispatchEvent(new Event("input", { bubbles: true }));
   };
 
