@@ -1,0 +1,8 @@
+{
+  "name": "mlbb-banpick",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test"
+  }
+}
