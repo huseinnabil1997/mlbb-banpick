@@ -4,12 +4,14 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Ban &amp; Pick Simpel - MLBB</title>
-<link rel="stylesheet" href="css/style.css?v=20261013a"/>
+<link rel="stylesheet" href="css/style.css?v=20261015a"/>
 </head>
 <body>
 <header class="app-header">
+  <div class="brand"><span class="brand-mark" aria-hidden="true">BP</span><div>
   <h1>Ban &amp; Pick Simpel</h1>
   <p class="sub">Rekomendasi dari ada/tidaknya counter dan sinergi, tanpa angka skor pasangan</p>
+  </div></div>
   <nav class="top-nav"><a href="index.html">Ban &amp; Pick</a><a href="simple.html" class="active">Ban &amp; Pick Simpel</a></nav>
 </header>
 <main class="wrap bp-wrap">
@@ -57,10 +59,12 @@
         <button type="button" class="role-chip on" data-lane="Gold Lane" aria-pressed="true">Gold</button>
         <button type="button" class="role-chip on" data-lane="Roaming" aria-pressed="true">Roam</button>
       </div>
+      <div class="bp-thead" aria-hidden="true"><span>No.</span><span>Hero</span><span>Skor</span></div>
       <div id="out-pick" class="bp-list"></div>
     </div>
     <div class="bp-col">
       <h2 class="section-title">Rekomendasi ban</h2>
+      <div class="bp-thead" aria-hidden="true"><span>No.</span><span>Hero</span><span>Skor</span></div>
       <div id="out-ban" class="bp-list"></div>
     </div>
   </section>

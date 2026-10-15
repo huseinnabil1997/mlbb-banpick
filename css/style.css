@@ -1,18 +1,20 @@
 :root {
-  --bg: #100e0c;
-  --bg-elev: #1a1612;
-  --card: #221c16;
-  --text: #f4efe6;
-  --muted: #b3a89a;
-  --accent: #e0b15a;
-  --accent-soft: rgba(224, 177, 90, 0.16);
-  --ok: #3dba7a;
-  --warn: #e0a84a;
-  --border: #3a3126;
-  --border-soft: #2e281f;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 8px 24px rgba(0,0,0,0.28);
+  --bg: #0d1424;
+  --bg-elev: #141d33;
+  --card: #1a2033;
+  --text: #ffffff;
+  --muted: #7890b3;
+  --link: #a3cff4;
+  --accent: #e3b866;
+  --accent-soft: rgba(227, 184, 102, 0.14);
+  --blue: #4b78ad;
+  --ok: #5fd39a;
+  --warn: #e3b866;
+  --border: #4a5981;
+  --border-soft: rgba(75, 120, 173, 0.2);
+  --radius: 4px;
+  --radius-sm: 4px;
+  --shadow: none;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -123,3 +125,76 @@ footer.app-footer { color: var(--muted); font-size: 0.82rem; text-align: center;
 .chip .bp-ico { width: 18px; height: 18px; font-size: 0.5rem; margin-left: -0.35rem; }
 .bp-ico img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .bp-ico [hidden] { display: none; }
+
+/* ===== Tema mirip tabel rank mobilelegends.com ===== */
+body { font-family: Arial, Helvetica, sans-serif; background: linear-gradient(180deg, #111a2e 0, #0d1424 420px) fixed, var(--bg); color: var(--link); }
+a { color: var(--link); }
+header.app-header { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem 1.5rem; padding: 0.7rem 1.5rem; background: rgba(9, 13, 24, 0.96); border-bottom: 1px solid var(--border-soft); }
+.brand { display: flex; align-items: center; gap: 0.75rem; min-width: 0; }
+.brand-mark { flex: 0 0 auto; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; color: #1a1408; background: linear-gradient(160deg, #f6dc9c, #c8913a); clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); }
+header.app-header h1 { margin: 0; font-size: 1.25rem; color: var(--text); text-transform: uppercase; letter-spacing: 0.04em; }
+header.app-header .sub { font-size: 0.8rem; color: var(--muted); }
+.top-nav { margin: 0 0 0 auto; gap: 0.25rem; }
+.top-nav a { border: 0; border-radius: 0; background: transparent; color: var(--muted); font-size: 0.85rem; font-weight: 400; padding: 0.5rem 0.75rem; border-bottom: 2px solid transparent; }
+.top-nav a:hover { color: var(--text); }
+.top-nav a.active { background: transparent; color: var(--text); border-bottom-color: var(--accent); }
+.wrap { max-width: 1200px; }
+.section-title { background: rgba(20, 39, 64, 0.6); border: 1px solid var(--border-soft); border-radius: 0; color: var(--text); font-weight: 400; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.bp-inputs, .bp-formula { background: rgba(26, 32, 51, 0.85); border: 1px solid var(--border-soft); border-radius: 0; box-shadow: none; }
+.bp-field label { color: var(--muted); font-weight: 400; font-size: 0.85rem; }
+.chip-box { background: transparent; border: 1px solid var(--border); border-radius: 4px; }
+.chip-box:focus-within { border-color: var(--link); }
+.chip-box input { color: var(--text); }
+.chip-box input::placeholder { color: var(--muted); }
+.mic-btn { border-color: var(--border); color: var(--link); border-radius: 4px; }
+.mic-btn:hover, .mic-btn.on { border-color: var(--link); background: rgba(75, 120, 173, 0.25); color: var(--text); }
+.chip { background: rgba(20, 39, 64, 0.8); border-radius: 999px; font-weight: 400; color: var(--text); }
+.chip-ban { border-color: rgba(227, 184, 102, 0.6); }
+.chip-ally { border-color: rgba(95, 211, 154, 0.6); }
+.chip-enemy { border-color: rgba(232, 110, 110, 0.65); }
+.chip button { color: var(--muted); }
+.ac-list { background: #1a2033; border-color: var(--border); border-radius: 4px; }
+.ac-list li { color: var(--link); border-radius: 0; }
+.ac-list li:hover, .ac-list li.on { background: rgba(75, 120, 173, 0.3); color: var(--text); }
+.bp-actions > button, .rank-chip, .role-chip { background: transparent; border: 1px solid var(--border); border-radius: 4px; color: var(--muted); font-weight: 400; }
+.bp-actions > button { color: var(--link); }
+.bp-actions > button:hover { border-color: var(--link); color: var(--text); }
+.rank-chip.on, .role-chip.on { background: rgba(75, 120, 173, 0.3); border-color: var(--link); color: var(--text); }
+.bp-list { gap: 0; border: 1px solid var(--border-soft); border-top: 0; background: rgba(26, 32, 51, 0.6); }
+.bp-list:empty { display: none; }
+.bp-thead { display: grid; grid-template-columns: 3.2rem 1fr auto; gap: 0.75rem; padding: 0.6rem 1rem; background: rgba(20, 39, 64, 0.6); border: 1px solid var(--border-soft); color: var(--muted); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.bp-thead span:last-child { text-align: right; }
+.bp-empty { background: transparent; border: 0; border-radius: 0; color: var(--muted); }
+.bp-card { padding: 0.75rem 1rem; background: transparent; border: 0; border-bottom: 1px solid var(--border-soft); border-radius: 0; box-shadow: none; }
+.bp-card:last-child { border-bottom: 0; }
+.bp-card:hover { background: rgba(75, 120, 173, 0.08); }
+.bp-rank { width: 2.4rem; height: 2.4rem; margin-right: 0.8rem; border: 0; border-radius: 0; background: transparent; color: var(--link); font-size: 1rem; font-weight: 400; }
+.bp-card:nth-child(-n+3) .bp-rank { color: #2a1f0c; font-weight: 700; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); background: linear-gradient(160deg, #f6dc9c, #b8822f); }
+.bp-card:nth-child(2) .bp-rank { background: linear-gradient(160deg, #eef2f7, #8e9cb0); }
+.bp-card:nth-child(3) .bp-rank { background: linear-gradient(160deg, #e9b98a, #96592d); }
+.bp-title h3 { gap: 0.6rem; font-weight: 400; font-size: 1.05rem; color: var(--link); }
+.bp-title .bp-ico { width: 40px; height: 40px; font-size: 0.85rem; background: #26304d; box-shadow: 0 0 0 1px rgba(163, 207, 244, 0.25); }
+.bp-role { display: block; margin-left: calc(40px + 0.6rem); color: var(--muted); }
+.bp-score { background: transparent; border: 0; color: var(--text); font-weight: 400; font-size: 1.05rem; }
+.bp-score.count { color: var(--link); }
+.bp-why { margin-left: calc(3.2rem + 0rem); }
+.bp-why li { background: rgba(20, 39, 64, 0.6); border-radius: 0; color: var(--link); }
+.bp-why li.plus b { color: var(--ok); }
+.bp-meta { margin-left: 3.2rem; color: var(--muted); }
+.formula-card { background: rgba(20, 39, 64, 0.6); border: 1px solid var(--border-soft); border-radius: 0; }
+.formula-card h3 { color: var(--accent); font-weight: 400; }
+.formula { color: var(--text); }
+footer.app-footer { border-top: 1px solid var(--border-soft); background: rgba(9, 13, 24, 0.96); }
+@media (max-width: 560px) {
+  header.app-header { padding: 0.6rem 1rem; }
+  .top-nav { margin: 0; width: 100%; }
+  .bp-thead { grid-template-columns: 2.6rem 1fr auto; padding: 0.5rem 0.75rem; }
+  .bp-card { padding: 0.65rem 0.75rem; }
+  .bp-rank { width: 2rem; height: 2rem; margin-right: 0.6rem; font-size: 0.9rem; }
+  .bp-title .bp-ico { width: 34px; height: 34px; }
+  .bp-role { margin-left: calc(34px + 0.6rem); }
+  .bp-why, .bp-meta { margin-left: 0; }
+}
+.bp-col-head { display: block; }
+.bp-col > .section-title, .bp-col-head .section-title { display: block; width: 100%; }
+.rank-chip, .role-chip, .bp-actions > button { font-size: 0.85rem; padding: 0.35rem 0.8rem; }
