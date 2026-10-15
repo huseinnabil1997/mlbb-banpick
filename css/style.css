@@ -225,3 +225,42 @@ body.hero-bg footer.app-footer { background: rgba(9, 13, 24, 0.85); }
 @media (prefers-reduced-motion: reduce) {
   body.hero-bg, .hero-art-layer, .hero-art-fade { transition: none; }
 }
+
+/* Revisi latar art: mulai di bawah header, lebih jelas, beri ruang area hero. */
+.hero-art { top: var(--hdr-h, 64px); height: 62vh; min-height: 380px; }
+.hero-art-layer { background-position: center 12%; }
+.hero-art-layer.on { opacity: 0.9; }
+.hero-art-fade { background: linear-gradient(180deg, rgba(13, 20, 36, 0) 0%, rgba(13, 20, 36, 0.1) 45%, var(--hero-bg-1, #111a2e) 100%); }
+body.hero-bg.has-art .wrap { padding-top: clamp(160px, 30vh, 300px); transition: padding-top 0.6s ease; }
+body.hero-bg .bp-inputs { background: rgba(20, 27, 46, 0.72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+body.hero-bg .bp-field label, body.hero-bg .bp-msg { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8); }
+body.hero-bg { background: linear-gradient(180deg, var(--hero-bg-1, #111a2e) 0, var(--hero-bg-1, #111a2e) calc(var(--hdr-h, 64px) + max(62vh, 380px)), var(--hero-bg-2, #0d1424) calc(var(--hdr-h, 64px) + max(62vh, 380px) + 60vh), #0d1424 100%); }
+@media (max-width: 560px) {
+  .hero-art { height: 46vh; min-height: 300px; }
+  .hero-art-layer { background-size: auto 100%; background-position: 50% 0; }
+  body.hero-bg.has-art .wrap { padding-top: clamp(150px, 26vh, 230px); }
+  body.hero-bg { background: linear-gradient(180deg, var(--hero-bg-1, #111a2e) 0, var(--hero-bg-1, #111a2e) calc(var(--hdr-h, 64px) + max(46vh, 300px)), var(--hero-bg-2, #0d1424) calc(var(--hdr-h, 64px) + max(46vh, 300px) + 60vh), #0d1424 100%); }
+}
+@media (prefers-reduced-motion: reduce) { body.hero-bg.has-art .wrap { transition: none; } }
+/* Desktop: tampilkan art utuh setinggi area (tanpa crop vertikal), tepi kiri/kanan memudar. */
+@media (min-width: 561px) {
+  .hero-art-layer { background-size: auto 100%; background-repeat: no-repeat; background-position: center top; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 22%, #000 78%, transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 22%, #000 78%, transparent 100%); }
+  body.hero-bg.has-art .wrap { padding-top: clamp(200px, 36vh, 340px); }
+}
+/* Art: lapis tajam (utuh) di atas versi blur yang memenuhi lebar layar. */
+.hero-art-layer { background: none !important; -webkit-mask-image: none !important; mask-image: none !important; overflow: hidden; }
+.hero-art-layer::before { content: ""; position: absolute; inset: -40px; background: var(--art) center 20% / cover no-repeat; filter: blur(28px) brightness(0.55) saturate(1.2); }
+.hero-art-layer::after { content: ""; position: absolute; inset: 0; background: var(--art) center top / auto 100% no-repeat;
+  -webkit-mask-image: radial-gradient(ellipse 34% 120% at 50% 0, #000 72%, transparent 100%); mask-image: radial-gradient(ellipse 34% 120% at 50% 0, #000 72%, transparent 100%); }
+@media (max-width: 560px) {
+  .hero-art-layer::after { background-size: cover; background-position: 50% 0; -webkit-mask-image: none; mask-image: none; }
+}
+@media (min-width: 561px) {
+  .hero-art { --art-h: max(62vh, 380px); }
+  .hero-art-layer::after {
+    -webkit-mask-image: linear-gradient(90deg, transparent calc(50% - var(--art-h) * 0.5), #000 calc(50% - var(--art-h) * 0.32), #000 calc(50% + var(--art-h) * 0.32), transparent calc(50% + var(--art-h) * 0.5)), linear-gradient(180deg, #000 70%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(90deg, transparent calc(50% - var(--art-h) * 0.5), #000 calc(50% - var(--art-h) * 0.32), #000 calc(50% + var(--art-h) * 0.32), transparent calc(50% + var(--art-h) * 0.5)), linear-gradient(180deg, #000 70%, transparent 100%);
+    mask-composite: intersect;
+  }
+}

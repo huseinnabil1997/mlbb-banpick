@@ -19,16 +19,22 @@
   art.innerHTML = '<div class="hero-art-layer"></div><div class="hero-art-layer"></div><div class="hero-art-fade"></div>';
   document.body.insertBefore(art, document.body.firstChild);
   var layers = art.querySelectorAll(".hero-art-layer"), front = 0;
+  // Art dimulai tepat di bawah header supaya tidak tertutup.
+  var header = document.querySelector("header.app-header");
+  function syncHeader() { root.style.setProperty("--hdr-h", (header ? header.offsetHeight : 0) + "px"); }
+  syncHeader();
+  window.addEventListener("resize", syncHeader);
   function showArt(url) {
-    if (!url) { layers[0].classList.remove("on"); layers[1].classList.remove("on"); return; }
+    if (!url) { layers[0].classList.remove("on"); layers[1].classList.remove("on"); document.body.classList.remove("has-art"); return; }
     var pre = new Image();
     pre.onload = function () {
       if (current !== url) return;
       var next = 1 - front;
-      layers[next].style.backgroundImage = 'url("' + url + '")';
+      layers[next].style.setProperty("--art", 'url("' + url + '")');
       layers[next].classList.add("on");
       layers[front].classList.remove("on");
       front = next;
+      document.body.classList.add("has-art");
     };
     pre.onerror = function () { if (current === url) showArt(null); };
     pre.src = url;
