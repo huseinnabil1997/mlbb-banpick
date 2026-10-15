@@ -198,3 +198,30 @@ footer.app-footer { border-top: 1px solid var(--border-soft); background: rgba(9
 .bp-col-head { display: block; }
 .bp-col > .section-title, .bp-col-head .section-title { display: block; width: 100%; }
 .rank-chip, .role-chip, .bp-actions > button { font-size: 0.85rem; padding: 0.35rem 0.8rem; }
+
+/* Latar dari hero rekomendasi pick #1 (js/hero-bg.js): art di atas memudar ke gradien warnanya. */
+@property --hero-bg-1 { syntax: "<color>"; inherits: true; initial-value: #111a2e; }
+@property --hero-bg-2 { syntax: "<color>"; inherits: true; initial-value: #0d1424; }
+body.hero-bg {
+  position: relative;
+  background: linear-gradient(180deg, var(--hero-bg-1, #111a2e) 0, var(--hero-bg-1, #111a2e) max(55vh, 340px), var(--hero-bg-2, #0d1424) calc(max(55vh, 340px) + 60vh), #0d1424 100%);
+  transition: --hero-bg-1 0.8s ease, --hero-bg-2 0.8s ease;
+}
+.hero-art { position: absolute; top: 0; left: 0; right: 0; height: 55vh; min-height: 340px; z-index: 0; pointer-events: none; overflow: hidden; }
+.hero-art-layer { position: absolute; inset: 0; background-size: cover; background-position: center 20%; opacity: 0; transition: opacity 0.8s ease; }
+.hero-art-layer.on { opacity: 0.55; }
+.hero-art-fade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(13, 20, 36, 0.55) 0%, rgba(13, 20, 36, 0.35) 35%, var(--hero-bg-1, #111a2e) 100%); transition: --hero-bg-1 0.8s ease; }
+body.hero-bg header.app-header { background: rgba(9, 13, 24, 0.78); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+body.hero-bg main, body.hero-bg footer { position: relative; z-index: 1; }
+body.hero-bg .bp-inputs, body.hero-bg .bp-formula { background: rgba(20, 27, 46, 0.86); }
+body.hero-bg .bp-list { background: rgba(20, 27, 46, 0.86); }
+body.hero-bg .bp-thead, body.hero-bg .section-title { background: rgba(16, 30, 52, 0.9); }
+body.hero-bg footer.app-footer { background: rgba(9, 13, 24, 0.85); }
+@media (max-width: 560px) {
+  .hero-art { height: 42vh; min-height: 260px; }
+  .hero-art-layer { background-position: 60% 15%; }
+  body.hero-bg { background: linear-gradient(180deg, var(--hero-bg-1, #111a2e) 0, var(--hero-bg-1, #111a2e) max(42vh, 260px), var(--hero-bg-2, #0d1424) calc(max(42vh, 260px) + 60vh), #0d1424 100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.hero-bg, .hero-art-layer, .hero-art-fade { transition: none; }
+}
